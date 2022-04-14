@@ -88,7 +88,7 @@ def check_ars(args: Namespace) -> None:
         raise Exception(f'start port must be in the range {range_of_ports}')
     if args.end_port < MIN_PORT or args.end_port > MAX_PORT:
         raise Exception(f'end port must be in the range {range_of_ports}')
-    if args.end_port > args.start_port:
+    if args.end_port < args.start_port:
         raise Exception(f"end port can't be smaller than start port")
 
 
