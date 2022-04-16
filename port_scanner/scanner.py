@@ -4,7 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 MIN_PORT = 1
 MAX_PORT = 2 ** 16
-MESSAGE = 'ping'.encode('utf_8')
+MESSAGE = b'\x13' + b'\x00' * 39 + b'\x6f\x89\xe9\x1a\xb6\xd5\x3b\xd3'#'ping'.encode('utf_8')
 
 
 def notify_about_port_openness(protocol: str, port: int) -> None:
@@ -26,21 +26,29 @@ def scan_port_udp(host: str, port: int) -> None:
     Если порт доступен, уведомляет об этом печатью
     соответствующего сообщения на экран.
     """
-    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_sk, \
-            socket.socket(
-                    socket.AF_INET,
-                    socket.SOCK_RAW,
-                    socket.IPPROTO_ICMP) as icmp_sk:
+    # with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_sk, \
+    #         socket.socket(
+    #                 socket.AF_INET,
+    #                 socket.SOCK_RAW,
+    #                 socket.IPPROTO_ICMP) as icmp_sk:
+    #     try:
+    #         udp_sk.sendto(MESSAGE, (host, port))
+    #         icmp_sk.settimeout(3)
+    #         # если порт закрыт, то ICMP пришлет сообщение об ошибке
+    #         data, _ = icmp_sk.recvfrom(1024)
+    #     except socket.timeout:
+    #         # в противном случае попытка получить сообщение вызовет исключение
+    #         # и тогда нужно посмотреть, работает ли udp на этом порте
+    #         if does_protocol_work_on_port(port, 'udp'):
+    #             notify_about_port_openness('UDP', port)
+    #     except socket.error:
+    #         pass
+    socket.setdefaulttimeout(3)
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as scanner:
         try:
-            udp_sk.sendto(MESSAGE, (host, port))
-            icmp_sk.settimeout(1)
-            # если порт закрыт, то ICMP пришлет сообщение об ошибке
-            data, _ = icmp_sk.recvfrom(1024)
-        except socket.timeout:
-            # в противном случае попытка получить сообщение вызовет исключение
-            # и тогда нужно посмотреть, работает ли udp на этом порте
-            if does_protocol_work_on_port(port, 'udp'):
-                notify_about_port_openness('UDP', port)
+            scanner.sendto(MESSAGE, (host, port))
+            data, _ = scanner.recvfrom(1024)
+            print(f'UDP {port} open')
         except socket.error:
             pass
 
