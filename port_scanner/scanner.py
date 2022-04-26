@@ -26,13 +26,12 @@ def scan_port_udp(host: str, port: int) -> None:
     Если порт доступен, уведомляет об этом печатью
     соответствующего сообщения на экран.
     """
-    # socket.setdefaulttimeout(3)
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as scanner:
         scanner.settimeout(3)
         try:
             scanner.sendto(MESSAGE, (host, port))
             data, _ = scanner.recvfrom(1024)
-            print(f'UDP {port} open')
+            notify_about_port_openness('UDP', port)
         except socket.error:
             pass
 
