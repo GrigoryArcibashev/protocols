@@ -4,7 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 MIN_PORT = 1
 MAX_PORT = 2 ** 16
-MESSAGE = b'\x13' + b'\x00' * 39 + b'\x6f\x89\xe9\x1a\xb6\xd5\x3b\xd3'#'ping'.encode('utf_8')
+MESSAGE = b'\x13' + b'\x00' * 39 + b'\x6f\x89\xe9\x1a\xb6\xd5\x3b\xd3'
 
 
 def notify_about_port_openness(protocol: str, port: int) -> None:
@@ -26,25 +26,9 @@ def scan_port_udp(host: str, port: int) -> None:
     Если порт доступен, уведомляет об этом печатью
     соответствующего сообщения на экран.
     """
-    # with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_sk, \
-    #         socket.socket(
-    #                 socket.AF_INET,
-    #                 socket.SOCK_RAW,
-    #                 socket.IPPROTO_ICMP) as icmp_sk:
-    #     try:
-    #         udp_sk.sendto(MESSAGE, (host, port))
-    #         icmp_sk.settimeout(3)
-    #         # если порт закрыт, то ICMP пришлет сообщение об ошибке
-    #         data, _ = icmp_sk.recvfrom(1024)
-    #     except socket.timeout:
-    #         # в противном случае попытка получить сообщение вызовет исключение
-    #         # и тогда нужно посмотреть, работает ли udp на этом порте
-    #         if does_protocol_work_on_port(port, 'udp'):
-    #             notify_about_port_openness('UDP', port)
-    #     except socket.error:
-    #         pass
-    socket.setdefaulttimeout(3)
+    # socket.setdefaulttimeout(3)
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as scanner:
+        scanner.settimeout(3)
         try:
             scanner.sendto(MESSAGE, (host, port))
             data, _ = scanner.recvfrom(1024)
@@ -60,17 +44,12 @@ def scan_port_tcp(host: str, port: int) -> None:
     соответствующего сообщения на экран.
     """
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sk:
+        sk.settimeout(1)
         try:
             sk.connect((host, port))
-        except (socket.timeout, TimeoutError, OSError):
-            return
-        try:
-            sk.send(MESSAGE)
-            sk.settimeout(1)
-            sk.recvfrom(1024)
             notify_about_port_openness('TCP', port)
-        except socket.error:
-            pass
+        except (socket.error, socket.timeout, TimeoutError, OSError):
+            return
 
 
 def scan_port(host: str, port: int) -> None:
