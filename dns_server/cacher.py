@@ -3,9 +3,10 @@ import time
 from typing import Any, Optional
 
 
-class Cache:
+class Cacher:
     def __init__(self, cache_file_name: str = 'cache.txt'):
         self._cache_file_name = cache_file_name
+        self._check_existence_of_cache_file()
         self._data = self._load()
 
     def add_record(self, name, record_type, ttl, value) -> None:
@@ -44,3 +45,11 @@ class Cache:
             if creation_time + ttl > time.time():
                 result[k] = v
         return result
+
+    def _check_existence_of_cache_file(self):
+        try:
+            with open(self._cache_file_name, 'rb'):
+                pass
+        except FileNotFoundError:
+            with open(self._cache_file_name, 'wb'):
+                pass

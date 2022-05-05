@@ -2,7 +2,7 @@ import socket
 from argparse import ArgumentParser
 from typing import Optional
 
-from cache import Cache
+from cacher import Cacher
 from dns_message_parser import DNSMessageParser
 
 DNS_PORT = 53
@@ -13,7 +13,7 @@ REQUEST_SIZE = 1024
 
 
 class DNSServer:
-    def __init__(self, cache: Cache, dns_ip: str = GOOGLE_DNS_SERVER_IP):
+    def __init__(self, cache: Cacher, dns_ip: str = GOOGLE_DNS_SERVER_IP):
         self._cache = cache
         self._dns_ip = dns_ip
         self._host_ip = get_host_ip()  # '192.168.1.72'
@@ -75,9 +75,9 @@ def make_argparser() -> ArgumentParser:
 def main() -> None:
     args = make_argparser().parse_args()
     if args.dns:
-        DNSServer(Cache(), args.dns).start()
+        DNSServer(Cacher(), args.dns).start()
     else:
-        DNSServer(Cache()).start()
+        DNSServer(Cacher()).start()
 
 
 if __name__ == '__main__':
