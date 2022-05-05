@@ -17,9 +17,7 @@ class DNSMessageParser:
         self._is_answer = self._flags[0]
         self.name, self.q_type, position = self._parse_question()
         self._question_len = position
-        self.info = None
-        if self._is_answer:
-            self.info = self._parse_body(position)
+        self.info = self._parse_body(position) if self._is_answer else None
 
     def make_answer(self, ttl, value):
         header = list(self._header[:12])
@@ -103,8 +101,8 @@ class DNSMessageParser:
         return answer_list + authority_list + additional_list
 
     @staticmethod
-    def _print_rr(name, t, value):
-        information = f'\tname {name}, type {t},  value{value}'
+    def _print_rr(name, _type, value):
+        information = f'\tname {name}, type {_type},  value{value}'
         print(information)
 
     def _parse_rr(self, start, number):
@@ -115,7 +113,6 @@ class DNSMessageParser:
             offset = end
             r_type, r_class, r_ttl, rd_length = struct.unpack(
                     '!2HIH', self._data[offset: offset + 10])
-
             offset += 10
             if r_type == 1:
                 ip = struct.unpack('!4B', self._data[offset: offset + 4])

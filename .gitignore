@@ -132,3 +132,6 @@ dmypy.json
 # My
 interpreter/
 .idea/
+
+# dns server
+dns_server/cache.txt
