@@ -55,10 +55,10 @@ class DNSMessageParser:
 
     def _parse_question(self):
         name, end = self._parse_name(12)
-        q_type, q_class = struct.unpack('!HH', self._data[end: end + 4])
-        information = f'Queries: name {name}, type {q_type}, class {q_class}'
+        qr_type, qr_class = struct.unpack('!HH', self._data[end: end + 4])
+        information = f'Queries: name {name}, type {qr_type}, class {qr_class}'
         print(information)
-        return name, q_type, end + 4
+        return name, qr_type, end + 4
 
     def _parse_name(self, start):
         name_list = []
@@ -70,8 +70,8 @@ class DNSMessageParser:
                 if not flag:
                     end = position + 2
                     flag = True
-                position = ((self._data[position] - 192) << 8) + self._data[
-                    position + 1]
+                position = ((self._data[position] - 192) << 8) \
+                    + self._data[position + 1]
                 continue
             else:
                 length = self._data[position]
@@ -86,26 +86,26 @@ class DNSMessageParser:
         return name, end
 
     def _parse_body(self, start):
-        answer_list, end1 = self._parse_rr(start, 3)
-        authority_list, end2 = self._parse_rr(end1, 4)
-        additional_list, end3 = self._parse_rr(end2, 5)
+        answer_list, end1 = self._parse_record(start, 3)
+        authority_list, end2 = self._parse_record(end1, 4)
+        additional_list, end3 = self._parse_record(end2, 5)
         if len(answer_list) != 0:
-            for e in answer_list:
-                self._print_rr(e[0], e[1], e[3])
+            for it in answer_list:
+                self._print_record(it[0], it[1], it[3])
         if len(authority_list) != 0:
-            for e in authority_list:
-                self._print_rr(e[0], e[1], e[3])
+            for it in authority_list:
+                self._print_record(it[0], it[1], it[3])
         if len(additional_list) != 0:
-            for e in additional_list:
-                self._print_rr(e[0], e[1], e[3])
+            for it in additional_list:
+                self._print_record(it[0], it[1], it[3])
         return answer_list + authority_list + additional_list
 
     @staticmethod
-    def _print_rr(name, _type, value):
+    def _print_record(name, _type, value):
         information = f'\tname {name}, type {_type},  value{value}'
         print(information)
 
-    def _parse_rr(self, start, number):
+    def _parse_record(self, start, number):
         offset = start
         rr_list = []
         for i in range(self._header[number]):
