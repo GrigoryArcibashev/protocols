@@ -11,7 +11,7 @@ API для сайта "В Контакте"
 - _Токен_:
 
   Для работы API нужен специальный токен доступа. Токен необходимо сохранить в
-  файл token, находящийся в корне папки проекта (/protocols/API/token)
+  файл token в корне папки проекта (/protocols/API/token)
 
   Инструкция по получению
   токена: https://dev.vk.com/api/access-token/getting-started
