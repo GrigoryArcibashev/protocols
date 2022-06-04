@@ -22,7 +22,7 @@ class DNSMessageParser:
         name, end = self.parse_name2(12)
         q_type, q_class = struct.unpack("!HH", self.data[end: end + 4])
         information = "Queries: name {0}, type {1}, class {2}".format(
-                name, q_type, q_class)
+            name, q_type, q_class)
         print(information)
         return name, q_type, end + 4
 
@@ -79,7 +79,7 @@ class DNSMessageParser:
             name, end = self.parse_name2(offset)
             offset = end
             r_type, r_class, r_ttl, rd_length = struct.unpack(
-                    "!2HIH", self.data[offset: offset + 10])
+                "!2HIH", self.data[offset: offset + 10])
 
             offset += 10
             if r_type == 1:

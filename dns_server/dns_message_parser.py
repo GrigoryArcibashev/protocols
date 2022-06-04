@@ -40,10 +40,10 @@ class DNSMessageParser:
             length = len(item)
         else:
             raise Exception(
-                    f'DNSServer can only handle requests of types '
-                    f'{Types.A.name}={Types.A.value} and '
-                    f'{Types.NS.name}={Types.NS.value}, '
-                    f'but the type of this request is {self.q_type}')
+                f'DNSServer can only handle requests of types '
+                f'{Types.A.name}={Types.A.value} and '
+                f'{Types.NS.name}={Types.NS.value}, '
+                f'but the type of this request is {self.q_type}')
 
         tail = struct.pack('!HHIH', self.q_type, 1, ttl, length)
         answer = struct.pack('!6H', *header) + question + name + tail + item
@@ -112,7 +112,7 @@ class DNSMessageParser:
             name, end = self._parse_name(offset)
             offset = end
             r_type, r_class, r_ttl, rd_length = struct.unpack(
-                    '!2HIH', self._data[offset: offset + 10])
+                '!2HIH', self._data[offset: offset + 10])
             offset += 10
             if r_type == 1:
                 ip = struct.unpack('!4B', self._data[offset: offset + 4])

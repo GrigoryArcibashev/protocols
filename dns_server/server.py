@@ -47,7 +47,7 @@ class DNSServer:
     def _get_answer_from_cache(self, request: DNSMessageParser) \
             -> Optional[bytes]:
         answer_from_cache = self._cache.get_record(
-                (request.name, request.q_type))
+            (request.name, request.q_type))
         if answer_from_cache is None:
             return None
         value = answer_from_cache[0]
